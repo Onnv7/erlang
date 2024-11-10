@@ -1,0 +1,10 @@
+{application, hello_app,
+ [
+  {description, "Hello API Application"},
+  {vsn, "0.1.0"},
+  {modules, [hello_app, hello_handler]},
+  {registered, []},
+  {applications, [kernel, stdlib, cowboy]},
+  {mod, {hello_app, []}},
+  {env, []}
+ ]}.
