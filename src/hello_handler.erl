@@ -27,16 +27,24 @@ handle_get(Req) ->
   {ok, Resp, []}.
 
 handle_post(Req) ->
-  {ok, Body, Req1} = cowboy_req:read_body(Req),
-  io:format("Received POST body: ~s~n", [Body]), % Thêm log để kiểm tra body nhận được
-  % Chuyển tất cả phần tử thành list trước khi kết hợp
-  ResponseBody = lists:concat([binary_to_list(<<"{\"message\": \"Received POST!\", \"body\": ">>),
-    binary_to_list(Body),
-    binary_to_list(<<"}">>)]),
-  {ok, Resp} = cowboy_req:reply(200,
-    #{<<"content-type">> => <<"application/json">>},
-    ResponseBody, Req1),
-  {ok, Resp, []}.
+    {ok, Body, Req1} = cowboy_req:read_body(Req),
+    io:format("Received POST body: ~s~n", [Body]),
+    
+    HardcodedData = #{<<"name">> => <<"John Doe">>, <<"age">> => 30, <<"city">> => <<"New York">>},
+
+    % Kết nối tới MongoDB và lưu dữ liệu
+    {ok, Pid} = mc_worker_api:connect([{host, "localhost"},  {port, 27017}, {database, <<"test3">>}]),
+    Collection = <<"test">>,
+    mc_worker_api:insert(Pid, Collection, HardcodedData),
+
+    io:format("Insert: ~n"),
+    ResponseBody = lists:concat([binary_to_list(<<"{\"message\": \"Received POST!\", \"body\": ">>),
+        binary_to_list(Body),
+        binary_to_list(<<"}">>)]),
+    {ok, Resp} = cowboy_req:reply(200,
+        #{<<"content-type">> => <<"application/json">>},
+        ResponseBody, Req1),
+    {ok, Resp, []}.
 
 
 
