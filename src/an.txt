@@ -1,9 +1,0 @@
-Type = single,
-Hosts = ,
-TopologyOptions = [],
-WorkerOptions = [{database, <<"test">>}],
-{ok, Conn} = mongo_api:connect(single, [{"localhost", 27017}], [], [{database, <<"test">>}]),
-
-application:ensure_all_started (mongodb).
-
-{ok, Connection} = mc_worker_api:connect("mongodb+srv://lama:0123456789@cluster0.1qwmnmy.mongodb.net/").

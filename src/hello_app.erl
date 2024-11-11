@@ -5,7 +5,6 @@
 
 start(_StartType, _StartArgs) ->
     mongo_id_server:start_link(),
-    % Khởi động kết nối MongoDB
     case mongo_conn:start_link() of
         {ok, _Conn} ->
             Dispatch = cowboy_router:compile([

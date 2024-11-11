@@ -32,7 +32,6 @@ handle_post(Req) ->
     
     HardcodedData = #{<<"name">> => <<"John Doe">>, <<"age">> => 30, <<"city">> => <<"New York">>},
 
-    % Kết nối tới MongoDB và lưu dữ liệu
     {ok, Pid} = mc_worker_api:connect([{host, "localhost"},  {port, 27017}, {database, <<"test3">>}]),
     Collection = <<"test">>,
     mc_worker_api:insert(Pid, Collection, HardcodedData),
