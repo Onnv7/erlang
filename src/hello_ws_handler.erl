@@ -10,11 +10,11 @@ websocket_init(State) ->
     Pid = self(),
     chat_room:arrive(Pid),
     io:fwrite("WebSocket websocket_init, Pid: ~w~n", [Pid]),
-    process_info(Pid), % Kiểm tra thông tin tiến trình ngay sau khi kết nối
     {ok, State}.
 
 websocket_handle({text, Msg}, State) ->
-    chat_room:broadcast(Msg),
+    SenderPid = self(),
+    chat_room:broadcast(SenderPid, Msg),
     {ok, State}.
 
 websocket_info({broadcast, Msg}, State) ->

@@ -2,7 +2,7 @@
 -behaviour(gen_server).
 
 %% API
--export([start_link/0, arrive/1, leave/1, get_clients/0, broadcast/1]).
+-export([start_link/0, arrive/1, leave/1, get_clients/0, broadcast/2]).
 %% gen_server callbacks
 -export([init/1, handle_cast/2, handle_call/3, terminate/2, code_change/3]).
 
@@ -20,12 +20,17 @@ leave(Pid) ->
 get_clients() ->
     gen_server:call(?MODULE, get_clients).
 
-broadcast(Msg) ->
+broadcast(SenderPid, Msg) ->
     Clients = get_clients(),
     io:fwrite("Broadcasting message ~w to ~w clients~n", [Msg, length(Clients)]),
     lists:foreach(fun(Pid) ->
-        io:fwrite("Sending message to ~w~n", [Pid]),
-        Pid ! {broadcast, Msg}
+        if
+            Pid =/= SenderPid ->
+                io:fwrite("Sending message to ~w~n", [Pid]),
+                Pid ! {broadcast, Msg};
+            true ->
+                ok
+        end
     end, Clients).
 
 %% gen_server callbacks
