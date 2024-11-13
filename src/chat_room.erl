@@ -12,10 +12,12 @@ start_link() ->
 
 arrive(Pid) ->
     io:fwrite("Arrive: ~w~n", [Pid]),
-    gen_server:cast(?MODULE, {arrive, Pid}).
+    gen_server:cast(?MODULE, {arrive, Pid}),
+    query("INSERT INTO clients (pid) VALUES ('" ++ erlang:pid_to_list(Pid) ++ "')").
 
 leave(Pid) ->
-    gen_server:cast(?MODULE, {leave, Pid}).
+    gen_server:cast(?MODULE, {leave, Pid}),
+    query("DELETE FROM clients WHERE pid = '" ++ erlang:pid_to_list(Pid) ++ "'").
 
 get_clients() ->
     gen_server:call(?MODULE, get_clients).
@@ -35,6 +37,7 @@ broadcast(SenderPid, Msg) ->
 
 %% gen_server callbacks
 init([]) ->
+    create_table(),
     {ok, []}.
 
 handle_cast({arrive, Pid}, State) ->
@@ -51,3 +54,14 @@ terminate(_Reason, _State) ->
 
 code_change(_OldVsn, State, _Extra) ->
     {ok, State}.
+
+create_table() ->
+    Sql = "CREATE TABLE IF NOT EXISTS clients (pid VARCHAR(255) PRIMARY KEY)",
+    query(Sql).
+
+query(Sql) ->
+    Pid = whereis(mysql_conn),
+    case Pid of
+        undefined -> {error, not_connected};
+        _ -> mysql:query(Pid, Sql)
+    end.
